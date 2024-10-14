@@ -4,3 +4,4 @@
 **/*.pth
 **/*.pyc
 **/wandb
+**/__pycache__/
