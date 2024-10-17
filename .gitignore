@@ -2,8 +2,11 @@
 **/dataset.zip
 **/__pycache__
 **/*.pth
+**/*.pyc
+**/wandb
+**/*.wandb
+**/__pycache__/
 **/*-master
 **/*.log
-**/*.wandb
 **/*.txt
-**/wandb
+
