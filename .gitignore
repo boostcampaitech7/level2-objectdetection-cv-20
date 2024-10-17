@@ -5,8 +5,7 @@
 **/*.pyc
 **/wandb
 **/*.wandb
-**/__pycache__/
 **/*-master
 **/*.log
 **/*.txt
-
+**/artifacts
