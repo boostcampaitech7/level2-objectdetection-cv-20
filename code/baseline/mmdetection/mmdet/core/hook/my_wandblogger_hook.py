@@ -209,21 +209,21 @@ class MyMMDetWandbHook(WandbLoggerHook):
         if not self.by_epoch:
             return
 
-        # Log checkpoint and metadata.
-        if (self.log_checkpoint
-                and self.every_n_epochs(runner, self.ckpt_interval)
-                or (self.ckpt_hook.save_last and self.is_last_epoch(runner))):
-            if self.log_checkpoint_metadata and self.eval_hook:
-                metadata = {
-                    'epoch': runner.epoch + 1,
-                    **self._get_eval_results()
-                }
-            else:
-                metadata = None
-            aliases = [f'epoch_{runner.epoch + 1}', 'latest']
-            model_path = osp.join(self.ckpt_hook.out_dir,
-                                  f'epoch_{runner.epoch + 1}.pth')
-            self._log_ckpt_as_artifact(model_path, aliases, metadata)
+        # # Log checkpoint and metadata.
+        # if (self.log_checkpoint
+        #         and self.every_n_epochs(runner, self.ckpt_interval)
+        #         or (self.ckpt_hook.save_last and self.is_last_epoch(runner))):
+        #     if self.log_checkpoint_metadata and self.eval_hook:
+        #         metadata = {
+        #             'epoch': runner.epoch + 1,
+        #             **self._get_eval_results()
+        #         }
+        #     else:
+        #         metadata = None
+        #     aliases = [f'epoch_{runner.epoch + 1}', 'latest']
+        #     model_path = osp.join(self.ckpt_hook.out_dir,
+        #                           f'epoch_{runner.epoch + 1}.pth')
+        #     self._log_ckpt_as_artifact(model_path, aliases, metadata)
 
         # Save prediction table
         if self.log_evaluation and self.eval_hook._should_evaluate(runner):
@@ -249,21 +249,21 @@ class MyMMDetWandbHook(WandbLoggerHook):
         if self.by_epoch:
             return
 
-        # Save checkpoint and metadata
-        if (self.log_checkpoint
-                and self.every_n_iters(runner, self.ckpt_interval)
-                or (self.ckpt_hook.save_last and self.is_last_iter(runner))):
-            if self.log_checkpoint_metadata and self.eval_hook:
-                metadata = {
-                    'iter': runner.iter + 1,
-                    **self._get_eval_results()
-                }
-            else:
-                metadata = None
-            aliases = [f'iter_{runner.iter + 1}', 'latest']
-            model_path = osp.join(self.ckpt_hook.out_dir,
-                                  f'iter_{runner.iter + 1}.pth')
-            self._log_ckpt_as_artifact(model_path, aliases, metadata)
+        # # Save checkpoint and metadata
+        # if (self.log_checkpoint
+        #         and self.every_n_iters(runner, self.ckpt_interval)
+        #         or (self.ckpt_hook.save_last and self.is_last_iter(runner))):
+        #     if self.log_checkpoint_metadata and self.eval_hook:
+        #         metadata = {
+        #             'iter': runner.iter + 1,
+        #             **self._get_eval_results()
+        #         }
+        #     else:
+        #         metadata = None
+        #     aliases = [f'iter_{runner.iter + 1}', 'latest']
+        #     model_path = osp.join(self.ckpt_hook.out_dir,
+        #                           f'iter_{runner.iter + 1}.pth')
+        #     self._log_ckpt_as_artifact(model_path, aliases, metadata)
 
         # Save prediction table
         if self.log_evaluation and self.eval_hook._should_evaluate(runner):
@@ -291,18 +291,18 @@ class MyMMDetWandbHook(WandbLoggerHook):
         # Update the W&B config.
         self.wandb.config.update(config_dict)
 
-    def _log_ckpt_as_artifact(self, model_path, aliases, metadata=None):
-        """Log model checkpoint as  W&B Artifact.
+    # def _log_ckpt_as_artifact(self, model_path, aliases, metadata=None):
+    #     """Log model checkpoint as  W&B Artifact.
 
-        Args:
-            model_path (str): Path of the checkpoint to log.
-            aliases (list): List of the aliases associated with this artifact.
-            metadata (dict, optional): Metadata associated with this artifact.
-        """
-        model_artifact = self.wandb.Artifact(
-            f'run_{self.wandb.run.id}_model', type='model', metadata=metadata)
-        model_artifact.add_file(model_path)
-        self.wandb.log_artifact(model_artifact, aliases=aliases)
+    #     Args:
+    #         model_path (str): Path of the checkpoint to log.
+    #         aliases (list): List of the aliases associated with this artifact.
+    #         metadata (dict, optional): Metadata associated with this artifact.
+    #     """
+    #     model_artifact = self.wandb.Artifact(
+    #         f'run_{self.wandb.run.id}_model', type='model', metadata=metadata)
+    #     model_artifact.add_file(model_path)
+    #     self.wandb.log_artifact(model_artifact, aliases=aliases)
 
     def _get_eval_results(self):
         """Get model evaluation results."""
