@@ -5,3 +5,4 @@
 **/*.pyc
 **/wandb
 **/__pycache__/
+**/baseline
