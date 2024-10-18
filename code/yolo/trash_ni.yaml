@@ -2,7 +2,7 @@
 path: ../../dataset/
 
 # 학습, 검증, 테스트 이미지 경로 (path에 대한 상대 경로)
-train: ../../dataset/yolo_train  # 학습 이미지
+train: ../../dataset/yolo_train80_ni  # 학습 이미지
 val: ../../dataset/yolo_val20_ni       # 검증 이미지
 test: ../../dataset/test   # 테스트 이미지
 
