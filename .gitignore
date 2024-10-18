@@ -9,4 +9,5 @@
 **/*-master
 **/*.log
 **/*.txt
-
+**/yolo/runs
+**/yolo/**.pt
