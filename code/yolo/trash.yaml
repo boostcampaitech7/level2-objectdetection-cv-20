@@ -2,9 +2,9 @@
 path: ../../dataset/
 
 # 학습, 검증, 테스트 이미지 경로 (path에 대한 상대 경로)
-train: val_5.json  # 학습 이미지
-val: val_5.json       # 검증 이미지
-test: images/test    # 테스트 이미지
+train: ../../dataset/yolo_train80  # 학습 이미지
+val: ../../dataset/yolo_val20       # 검증 이미지
+test: ../../dataset/yolo_val20    # 테스트 이미지
 
 # 클래스 목록
 names:
