@@ -118,11 +118,11 @@ train_dataloader = dict(
     batch_size=16,
     num_workers=8,
     dataset=dict(type=dataset_type, pipeline=train_pipeline))
-val_dataloader = dict(dataset=dict(type=dataset_type, pipeline=test_pipeline))
-test_dataloader = val_dataloader
+#val_dataloader = dict(dataset=dict(type=dataset_type, pipeline=test_pipeline))
+#test_dataloader = val_dataloader
 
-val_evaluator = dict(type=evalute_type)
-test_evaluator = val_evaluator
+#val_evaluator = dict(type=evalute_type)
+#test_evaluator = val_evaluator
 
 optim_wrapper = dict(
     optimizer=dict(lr=0.16, weight_decay=4e-5),
@@ -131,7 +131,7 @@ optim_wrapper = dict(
     clip_grad=dict(max_norm=10, norm_type=2))
 
 # learning policy
-max_epochs = 300
+max_epochs = 30
 param_scheduler = [
     dict(type='LinearLR', start_factor=0.1, by_epoch=False, begin=0, end=917),
     dict(
@@ -173,8 +173,8 @@ auto_scale_lr = dict(base_batch_size=128)
 ### schedule_1x.py
 # # training schedule for 1x
 train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=12, val_interval=1)
-val_cfg = dict(type='ValLoop')
-test_cfg = dict(type='TestLoop')
+#val_cfg = dict(type='ValLoop')
+#test_cfg = dict(type='TestLoop')
 
 # learning rate
 param_scheduler = [
