@@ -131,7 +131,7 @@ optim_wrapper = dict(
     clip_grad=dict(max_norm=10, norm_type=2))
 
 # learning policy
-max_epochs = 30
+max_epochs = 3
 param_scheduler = [
     dict(type='LinearLR', start_factor=0.1, by_epoch=False, begin=0, end=917),
     dict(
@@ -152,7 +152,8 @@ vis_backends = [
 visualizer = dict(
     type='DetLocalVisualizer', vis_backends=vis_backends, name='visualizer')
 
-default_hooks = dict(checkpoint=dict(type='CheckpointHook', interval=15))
+default_hooks = dict(checkpoint=dict(type='CheckpointHook', interval=1),
+                     logger=dict(_scope_='mmdet', interval=50, type='LoggerHook'))
 custom_hooks = [
     dict(
         type='EMAHook',
@@ -172,7 +173,7 @@ auto_scale_lr = dict(base_batch_size=128)
 
 ### schedule_1x.py
 # # training schedule for 1x
-train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=12, val_interval=1)
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=3, val_interval=1)
 #val_cfg = dict(type='ValLoop')
 #test_cfg = dict(type='TestLoop')
 
