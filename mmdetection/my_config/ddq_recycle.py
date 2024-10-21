@@ -1,5 +1,10 @@
+# python tools/train.py ./my_config/ddq_recycle.py
+
+'''
+dataset
+'''
 # dataset settings
-dataset_type = 'RecycleDataset'
+dataset_type = 'TrashDataset'
 data_root = '/data/ephemeral/home/level2-objectdetection-cv-20/dataset/'
 
 # Example to use different file client
@@ -17,6 +22,9 @@ data_root = '/data/ephemeral/home/level2-objectdetection-cv-20/dataset/'
 #     }))
 backend_args = None
 
+'''
+dataset - pipeline
+'''
 train_pipeline = [
     dict(type='LoadImageFromFile', backend_args=backend_args),
     dict(type='LoadAnnotations', with_bbox=True),
@@ -65,6 +73,10 @@ test_pipeline = [
         meta_keys=('img_id', 'img_path', 'ori_shape', 'img_shape',
                    'scale_factor'))
 ]
+
+'''
+dataset - dataloader
+'''
 train_dataloader = dict(
     batch_size=2,
     num_workers=2,
@@ -109,7 +121,7 @@ test_dataloader = dict(
         backend_args=backend_args))
 
 '''
-evaluator
+dataset - evaluator
 '''
 # val_evaluator = dict(
 #     type='CocoMetric',
@@ -129,7 +141,9 @@ test_evaluator = dict(
 # inference on test dataset and
 # format the output results for submission.
 
-
+'''
+model
+'''
 
 pretrained = 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_large_patch4_window12_384_22k.pth'  # noqa: E501
 model = dict(
@@ -237,7 +251,7 @@ optim_wrapper = dict(
     paramwise_cfg=dict(custom_keys={'backbone': dict(lr_mult=0.05)}))
 
 # learning policy
-max_epochs = 30
+max_epochs = 20
 train_cfg = dict(
     type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=1)
 
@@ -295,7 +309,7 @@ default_scope = 'mmdet'
 
 default_hooks = dict(
     timer=dict(type='IterTimerHook'),
-    logger=dict(type='LoggerHook', interval=2442),
+    logger=dict(type='LoggerHook', interval=100),
     param_scheduler=dict(type='ParamSchedulerHook'),
     checkpoint=dict(type='CheckpointHook', interval=1),
     sampler_seed=dict(type='DistSamplerSeedHook'),
@@ -319,7 +333,7 @@ visualizer = dict(
     type='DetLocalVisualizer', 
     vis_backends=vis_backends, 
     name='visualizer')
-log_processor = dict(type='LogProcessor', window_size=2442, by_epoch=True)
+log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 
 log_level = 'INFO'
 load_from = None
