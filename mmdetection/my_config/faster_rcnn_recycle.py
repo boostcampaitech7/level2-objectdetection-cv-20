@@ -1,7 +1,7 @@
-# python tools/train.py ./my_config/h_dino_recycle.py
+# python tools/train.py ./my_config/faster_rcnn_recycle.py
 # dataset settings
 dataset_type = 'TrashDataset'
-data_root = '/data/ephemeral/home/dataset/'
+data_root = '/data/ephemeral/home/level2-objectdetection-cv-20/dataset/'
 
 # Example to use different file client
 # Method 1: simply set the data root and let the file I/O module
@@ -202,20 +202,20 @@ model = dict(
                 add_gt_as_proposals=True),
             pos_weight=-1,
             debug=False)),
-    # test_cfg=dict(
-    #     rpn=dict(
-    #         nms_pre=1000,
-    #         max_per_img=1000,
-    #         nms=dict(type='nms', iou_threshold=0.7),
-    #         min_bbox_size=0),
-    #     rcnn=dict(
-    #         score_thr=0.05,
-    #         nms=dict(type='nms', iou_threshold=0.5),
-    #         max_per_img=100)
-    #     # soft-nms is also supported for rcnn testing
-    #     # e.g., nms=dict(type='soft_nms', iou_threshold=0.5, min_score=0.05)
-    # ))
-)
+    test_cfg=dict(
+        rpn=dict(
+            nms_pre=1000,
+            max_per_img=1000,
+            nms=dict(type='nms', iou_threshold=0.7),
+            min_bbox_size=0),
+        rcnn=dict(
+            score_thr=0.05,
+            nms=dict(type='nms', iou_threshold=0.5),
+            max_per_img=100)
+        # soft-nms is also supported for rcnn testing
+        # e.g., nms=dict(type='soft_nms', iou_threshold=0.5, min_score=0.05)
+    ))
+
 
 
 '''
