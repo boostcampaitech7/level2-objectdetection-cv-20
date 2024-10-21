@@ -168,9 +168,9 @@ model = dict(
         init_cfg=dict(type='Pretrained', checkpoint=pretrained)),
     neck=dict(
         type='FPN',
-        in_channels=[256, 512, 1024, 2048],
+        in_channels=[384, 768, 1536],
         out_channels=256,
-        start_level=1,
+        start_level=0,
         add_extra_convs='on_output',
         num_outs=5),
     bbox_head=dict(
@@ -268,6 +268,7 @@ tta_pipeline = [
 '''
 runtime
 '''
+checkpoint_config = dict(interval=1)
 
 default_scope = 'mmdet'
 
