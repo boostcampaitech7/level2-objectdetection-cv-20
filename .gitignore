@@ -4,5 +4,11 @@
 **/*.pth
 **/*.pyc
 **/wandb
+**/*.wandb
 **/__pycache__/
-**/baseline
+**/*-master
+**/*.log
+**/*.txt
+**/yolo/runs
+**/yolo/**.pt
+**/*.csv
