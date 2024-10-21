@@ -136,7 +136,7 @@ test_evaluator = dict(
     format_only=True,
     classwise=True,
     backend_args=backend_args, 
-    outfile_prefix='./work_dirs/ddq_recycle/result/ddq_wo_tta')
+    outfile_prefix='./work_dirs/ddq_recycle/result/ddq_w_tta')
 
 # inference on test dataset and
 # format the output results for submission.
