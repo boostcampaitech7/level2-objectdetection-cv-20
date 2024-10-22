@@ -18,12 +18,24 @@ data_root = '/data/ephemeral/home/level2-objectdetection-cv-20/dataset/'
 #     }))
 backend_args = None
 
+img_norm_cfg = dict(mean=[123.675, 116.28, 103.53], 
+                    std=[58.395, 57.12, 57.375], to_rgb=True)
+
 train_pipeline = [
-    dict(type='LoadImageFromFile', backend_args=backend_args),
-    dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='Resize', scale=(512, 512), keep_ratio=True),
-    dict(type='RandomFlip', prob=0.5),
-    dict(type='PackDetInputs')
+    dict(type='Compose',
+         transforms= [
+            dict(type='LoadImageFromFile', backend_args=backend_args),
+            dict(type='LoadAnnotations', with_bbox=True),
+            dict(type='RandomFlip', prob=0.5, direction='horizontal'),
+            dict(type='RandomFlip', prob=0.5, direction='vertical'),
+            dict(type='RandomCrop', crop_size=(300, 300), bbox_clip_border=True),
+            dict(type='PhotoMetricDistortion', brightness_delta=20,
+                 saturation_range=(-30/255, 30/255), hue_delta=20),
+            dict(type='Resize', scale=(1024, 1024), keep_ratio=True),
+            dict(type='Normalize', **img_norm_cfg),
+            dict(type='PackDetInputs')
+         ]
+    )
 ]
 # test_pipeline = [
 #     dict(type='LoadImageFromFile', backend_args=backend_args),
