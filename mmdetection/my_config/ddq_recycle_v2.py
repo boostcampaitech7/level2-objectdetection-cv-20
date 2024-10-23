@@ -34,28 +34,61 @@ dataset - pipeline
 img_norm_cfg = dict(mean=[123.675, 116.28, 103.53], 
                     std=[58.395, 57.12, 57.375], to_rgb=True)
 
+
 train_pipeline = [
     dict(type='LoadImageFromFile', backend_args=backend_args),
-    dict(type='LoadAnnotations', with_bbox=True),    
-    dict(type='Compose',
-         transforms= [
-            dict(type='LoadImageFromFile', backend_args=backend_args),
-            dict(type='LoadAnnotations', with_bbox=True),
-            dict(type='RandomFlip', prob=0.5, direction='horizontal'),
-            dict(type='RandomFlip', prob=0.5, direction='vertical'),
-            dict(type='RandomCrop', crop_size=(300, 300), bbox_clip_border=True),
-            dict(type='PhotoMetricDistortion', brightness_delta=20,
-                 saturation_range=(-30/255, 30/255), hue_delta=20),
-            dict(type='Resize', scale=(1024, 1024), keep_ratio=True),
-            dict(type='Normalize', **img_norm_cfg),
-            dict(type='PackDetInputs')
-         ]
-    )
+    dict(type='LoadAnnotations', with_bbox=True),
+    # dict(type='Resize', scale=(1024, 1024), keep_ratio=True),  # 이 부분을 제거하거나 위로 옮김
+    dict(
+        type='RandomChoice',
+        transforms=[
+            [
+                dict(
+                    type='RandomChoiceResize',
+                    scales=[(480, 1333), (512, 1333), (544, 1333), (576, 1333),
+                            (608, 1333), (640, 1333), (672, 1333), (704, 1333),
+                            (736, 1333), (768, 1333), (800, 1333)],
+                    keep_ratio=True)
+            ],
+            [
+                dict(
+                    type='RandomChoiceResize',
+                    scales=[(400, 4200), (500, 4200), (600, 4200)],
+                    keep_ratio=True),
+                dict(
+                    type='RandomCrop',
+                    crop_type='absolute_range',
+                    crop_size=(384, 600),
+                    allow_negative_crop=True),
+                dict(
+                    type='RandomChoiceResize',
+                    scales=[(480, 1333), (512, 1333), (544, 1333), (576, 1333),
+                            (608, 1333), (640, 1333), (672, 1333), (704, 1333),
+                            (736, 1333), (768, 1333), (800, 1333)],
+                    keep_ratio=True)
+            ]
+        ]),
+    dict(type='RandomFlip', prob=0.5, direction='horizontal'),
+    dict(type='RandomFlip', prob=0.5, direction='vertical'),
+    dict(type='RandomCrop', crop_size=(300, 300), bbox_clip_border=True),
+    dict(
+        type='PhotoMetricDistortion',
+        brightness_delta=20,
+        saturation_range=(-30 / 255, 30 / 255),
+        hue_delta=20
+    ),    
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True
+    ),
+    dict(type='PackDetInputs')
 ]
 
 test_pipeline = [
     dict(type='LoadImageFromFile', backend_args=backend_args),
-    dict(type='Resize', scale=(512,512), keep_ratio=True),
+    dict(type='Resize', scale=(1024,1024), keep_ratio=True),
     # If you don't have a gt annotation, delete the pipeline
     dict(type='LoadAnnotations', with_bbox=True),
     dict(
@@ -68,8 +101,8 @@ test_pipeline = [
 dataset - dataloader
 '''
 train_dataloader = dict(
-    batch_size=2,
-    num_workers=2,
+    batch_size=4,
+    num_workers=4,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     batch_sampler=dict(type='AspectRatioBatchSampler'),
@@ -83,8 +116,8 @@ train_dataloader = dict(
         backend_args=backend_args))
 
 val_dataloader = dict(
-    batch_size=1,
-    num_workers=2,
+    batch_size=4,
+    num_workers=4,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
@@ -121,7 +154,6 @@ val_evaluator = dict(
     metric='bbox',
     format_only=False,
     classwise=True,
-    outfile_prefix='./work_dirs/ddq_recycle_v2/result/ddq_val',
     backend_args=backend_args)
 
 test_evaluator = dict(
@@ -242,7 +274,7 @@ model = dict(
 # optimizer
 optim_wrapper = dict(
     type='OptimWrapper',
-    optimizer=dict(type='AdamW', lr=0.0002, weight_decay=0.05),
+    optimizer=dict(type='AdamW', lr=0.0001, weight_decay=0.05),
     clip_grad=dict(max_norm=0.1, norm_type=2),
     paramwise_cfg=dict(custom_keys={'backbone': dict(lr_mult=0.05)}))
 
