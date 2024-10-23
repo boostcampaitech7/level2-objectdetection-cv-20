@@ -87,7 +87,7 @@ test_pipeline = [
 dataset - dataloader
 '''
 train_dataloader = dict(
-    batch_size=16,
+    batch_size=2,
     num_workers=8,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
@@ -102,7 +102,7 @@ train_dataloader = dict(
         backend_args=backend_args))
 
 val_dataloader = dict(
-    batch_size=16,
+    batch_size=2,
     num_workers=8,
     persistent_workers=True,
     drop_last=False,
@@ -260,10 +260,10 @@ optim_wrapper = dict(
     type='OptimWrapper',
     optimizer=dict(
         type='AdamW',
-        lr=0.0001,  # 0.0002 for DeformDETR
+        lr=0.0001, 
         weight_decay=0.0001),
     clip_grad=dict(max_norm=0.1, norm_type=2),
-    paramwise_cfg=dict(custom_keys={'backbone': dict(lr_mult=0.1)})
+    paramwise_cfg=dict(custom_keys={'backbone': dict(lr_mult=0.1)}),
 )  # custom_keys contains sampling_offsets and reference_points in DeformDETR  # noqa
 
 # learning policy
@@ -327,7 +327,11 @@ default_hooks = dict(
     timer=dict(type='IterTimerHook'),
     logger=dict(type='LoggerHook', interval=100),
     param_scheduler=dict(type='ParamSchedulerHook'),
-    checkpoint=dict(type='CheckpointHook', interval=1),
+    checkpoint=dict(type='CheckpointHook',
+                    by_epoch=True,
+                    save_last=True,
+                    max_keep_ckpts=3,
+                    interval=1),
     sampler_seed=dict(type='DistSamplerSeedHook'),
     visualization=dict(type='DetVisualizationHook'))
 
@@ -353,4 +357,4 @@ log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 
 log_level = 'INFO'
 load_from = None
-resume = None'./work_dirs/dino_swin_recycle/epoch_1.pth'
+resume = None# './work_dirs/dino_swin_recycle/epoch_1.pth'

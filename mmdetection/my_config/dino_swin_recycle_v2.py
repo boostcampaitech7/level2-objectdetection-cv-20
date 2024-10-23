@@ -38,7 +38,7 @@ dataset - pipeline
 train_pipeline = [
     dict(type='LoadImageFromFile', backend_args=backend_args),
     dict(type='LoadAnnotations', with_bbox=True),
-    dict(type='RandomFlip', prob=0.5),
+    dict(type='Resize', scale=(1024, 1024), keep_ratio=True),  # 이 부분을 제거하거나 위로 옮김
     dict(
         type='RandomChoice',
         transforms=[
@@ -53,8 +53,6 @@ train_pipeline = [
             [
                 dict(
                     type='RandomChoiceResize',
-                    # The radio of all image in train dataset < 7
-                    # follow the original implement
                     scales=[(400, 4200), (500, 4200), (600, 4200)],
                     keep_ratio=True),
                 dict(
@@ -70,6 +68,21 @@ train_pipeline = [
                     keep_ratio=True)
             ]
         ]),
+    dict(type='RandomFlip', prob=0.5, direction='horizontal'),
+    dict(type='RandomFlip', prob=0.5, direction='vertical'),
+    dict(type='RandomCrop', crop_size=(300, 300), bbox_clip_border=True),
+    dict(
+        type='PhotoMetricDistortion',
+        brightness_delta=20,
+        saturation_range=(-30 / 255, 30 / 255),
+        hue_delta=20
+    ),    
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True
+    ),
     dict(type='PackDetInputs')
 ]
 test_pipeline = [
@@ -88,7 +101,7 @@ dataset - dataloader
 '''
 train_dataloader = dict(
     batch_size=16,
-    num_workers=8,
+    num_workers=16,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     batch_sampler=dict(type='AspectRatioBatchSampler'),
@@ -103,7 +116,7 @@ train_dataloader = dict(
 
 val_dataloader = dict(
     batch_size=16,
-    num_workers=8,
+    num_workers=16,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
@@ -117,8 +130,8 @@ val_dataloader = dict(
         backend_args=backend_args))
 
 test_dataloader = dict(
-    batch_size=1,
-    num_workers=2,
+    batch_size=16,
+    num_workers=16,
     persistent_workers=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
@@ -257,17 +270,18 @@ model = dict(
 
 # optimizer
 optim_wrapper = dict(
-    type='OptimWrapper',
+    type='AmpOptimWrapper',
     optimizer=dict(
         type='AdamW',
         lr=0.0001,  # 0.0002 for DeformDETR
-        weight_decay=0.0001),
+        weight_decay=0.001),
     clip_grad=dict(max_norm=0.1, norm_type=2),
-    paramwise_cfg=dict(custom_keys={'backbone': dict(lr_mult=0.1)})
+    paramwise_cfg=dict(custom_keys={'backbone': dict(lr_mult=0.1)}),
+    loss_scale='dynamic', 
 )  # custom_keys contains sampling_offsets and reference_points in DeformDETR  # noqa
 
 # learning policy
-max_epochs = 20
+max_epochs = 30
 train_cfg = dict(
     type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=1)
 
@@ -353,4 +367,4 @@ log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 
 log_level = 'INFO'
 load_from = None
-resume = None'./work_dirs/dino_swin_recycle/epoch_1.pth'
+resume = './work_dirs/dino_swin_recycle/epoch_1.pth'
