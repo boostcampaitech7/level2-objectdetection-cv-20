@@ -1,5 +1,3 @@
-# python tools/train.py ./my_config/ddq_recycle.py
-
 '''
 dataset
 '''
@@ -91,20 +89,6 @@ train_dataloader = dict(
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         pipeline=train_pipeline,
         backend_args=backend_args))
-# val_dataloader = dict(
-#     batch_size=1,
-#     num_workers=2,
-#     persistent_workers=True,
-#     drop_last=False,
-#     sampler=dict(type='DefaultSampler', shuffle=False),
-#     dataset=dict(
-#         type=dataset_type,
-#         data_root=data_root,
-#         ann_file='annotations/instances_val2017.json',
-#         data_prefix=dict(img='val2017/'),
-#         test_mode=True,
-#         pipeline=test_pipeline,
-#         backend_args=backend_args))
 test_dataloader = dict(
     batch_size=1,
     num_workers=2,
@@ -123,12 +107,6 @@ test_dataloader = dict(
 '''
 dataset - evaluator
 '''
-# val_evaluator = dict(
-#     type='CocoMetric',
-#     ann_file=data_root + 'annotations/instances_val2017.json',
-#     metric='bbox',
-#     format_only=False,
-#     backend_args=backend_args)
 test_evaluator = dict(
     type='CocoMetric',
     ann_file=data_root + 'test.json',
@@ -326,7 +304,7 @@ vis_backends = [dict(type='LocalVisBackend'),
                 dict(type='WandbVisBackend',
                      init_kwargs={
                          'project':'recycle',
-                         'name': 'ddq_recycle_resume'
+                         'name': 'ddq_recycle'
                      })]
 
 visualizer = dict(
@@ -337,4 +315,4 @@ log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 
 log_level = 'INFO'
 load_from = None
-resume = '/data/ephemeral/home/level2-objectdetection-cv-20/mmdetection/work_dirs/ddq_recycle/ddq_epoch_15.pth'
+resume = None
