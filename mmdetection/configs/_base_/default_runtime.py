@@ -22,3 +22,10 @@ log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 log_level = 'INFO'
 load_from = None
 resume = False
+
+vis_backends = [dict(type='LocalVisBackend'),
+                dict(type='WandbVisBackend',
+                     init_kwargs={
+                         'project':'object-detection',
+                         'name': 'EfficientDet_recycle'
+                     })]

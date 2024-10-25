@@ -119,10 +119,10 @@ train_dataloader = dict(
     num_workers=8,
     dataset=dict(type=dataset_type, pipeline=train_pipeline))
 #val_dataloader = dict(dataset=dict(type=dataset_type, pipeline=test_pipeline))
-#test_dataloader = val_dataloader
+test_dataloader = dict(dataset=dict(type=dataset_type, pipeline=test_pipeline))
 
 #val_evaluator = dict(type=evalute_type)
-#test_evaluator = val_evaluator
+test_evaluator = dict(type=evalute_type)
 
 optim_wrapper = dict(
     optimizer=dict(lr=0.16, weight_decay=4e-5),
@@ -131,7 +131,7 @@ optim_wrapper = dict(
     clip_grad=dict(max_norm=10, norm_type=2))
 
 # learning policy
-max_epochs = 3
+max_epochs = 30
 param_scheduler = [
     dict(type='LinearLR', start_factor=0.1, by_epoch=False, begin=0, end=917),
     dict(
@@ -173,9 +173,9 @@ auto_scale_lr = dict(base_batch_size=128)
 
 ### schedule_1x.py
 # # training schedule for 1x
-train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=3, val_interval=1)
+train_cfg = dict(type='EpochBasedTrainLoop', max_epochs=30, val_interval=1)
 #val_cfg = dict(type='ValLoop')
-#test_cfg = dict(type='TestLoop')
+test_cfg = dict(type='TestLoop')
 
 # learning rate
 param_scheduler = [
@@ -200,3 +200,25 @@ optim_wrapper = dict(
 #       or not by default.
 #   - `base_batch_size` = (8 GPUs) x (2 samples per GPU).
 auto_scale_lr = dict(enable=False, base_batch_size=16)
+
+'''
+tta
+'''
+
+tta_model = dict(
+   type='DetTTAModel',
+   tta_cfg=dict(nms=dict(type='nms', iou_threshold=0.5), max_per_img=100))
+tta_pipeline = [
+       dict(type='LoadImageFromFile', file_client_args=dict(backend='disk')),
+       dict(type='TestTimeAug',
+            transforms=[
+                [dict(type='Resize', scale=(1333, 800), keep_ratio=True),
+                 dict(type='Resize', scale=(1333, 600), keep_ratio=True)],
+                [dict(type='RandomFlip', prob=1.),
+                 dict(type='RandomFlip', prob=0.)],
+                [dict(type='LoadAnnotations', with_bbox=True)],
+                [dict(type='PackDetInputs',
+                      meta_keys=('img_id', 'img_path', 'ori_shape',
+                                 'img_shape', 'scale_factor', 'flip',
+                                 'flip_direction'))]])
+]
