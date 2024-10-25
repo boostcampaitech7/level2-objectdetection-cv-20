@@ -10,3 +10,5 @@
 **/*.log
 **/*.txt
 **/work_dirs/
+**/*.pt
+**/yolo/runs
