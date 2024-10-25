@@ -8,6 +8,11 @@
 **/*-master
 **/*.log
 **/*.txt
+
+**/work_dirs/
+**/*.pt
+**/yolo/runs
+
 **/sample
 **/newdataset
 **/yolo/runs
@@ -15,3 +20,4 @@
 **/*.csv
 
 **/artifacts
+
