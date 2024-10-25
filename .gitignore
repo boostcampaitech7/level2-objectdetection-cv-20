@@ -8,4 +8,10 @@
 **/*-master
 **/*.log
 **/*.txt
+**/sample
+**/newdataset
+**/yolo/runs
+**/yolo/**.pt
+**/*.csv
+
 **/artifacts
