@@ -1,5 +1,3 @@
-# python tools/train.py ./my_config/ddq_recycle.py
-
 '''
 dataset
 '''
@@ -65,7 +63,7 @@ train_pipeline = [
 
 test_pipeline = [
     dict(type='LoadImageFromFile', backend_args=backend_args),
-    dict(type='Resize', scale=(512,512), keep_ratio=True),
+    dict(type='Resize', scale=(1024, 1024), keep_ratio=True),
     # If you don't have a gt annotation, delete the pipeline
     dict(type='LoadAnnotations', with_bbox=True),
     dict(
@@ -79,7 +77,7 @@ dataset - dataloader
 '''
 train_dataloader = dict(
     batch_size=2,
-    num_workers=2,
+    num_workers=4,
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     batch_sampler=dict(type='AspectRatioBatchSampler'),
@@ -91,20 +89,6 @@ train_dataloader = dict(
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         pipeline=train_pipeline,
         backend_args=backend_args))
-# val_dataloader = dict(
-#     batch_size=1,
-#     num_workers=2,
-#     persistent_workers=True,
-#     drop_last=False,
-#     sampler=dict(type='DefaultSampler', shuffle=False),
-#     dataset=dict(
-#         type=dataset_type,
-#         data_root=data_root,
-#         ann_file='annotations/instances_val2017.json',
-#         data_prefix=dict(img='val2017/'),
-#         test_mode=True,
-#         pipeline=test_pipeline,
-#         backend_args=backend_args))
 test_dataloader = dict(
     batch_size=1,
     num_workers=2,
@@ -123,12 +107,6 @@ test_dataloader = dict(
 '''
 dataset - evaluator
 '''
-# val_evaluator = dict(
-#     type='CocoMetric',
-#     ann_file=data_root + 'annotations/instances_val2017.json',
-#     metric='bbox',
-#     format_only=False,
-#     backend_args=backend_args)
 test_evaluator = dict(
     type='CocoMetric',
     ann_file=data_root + 'test.json',
@@ -136,7 +114,7 @@ test_evaluator = dict(
     format_only=True,
     classwise=True,
     backend_args=backend_args, 
-    outfile_prefix='./work_dirs/ddq_recycle/result/ddq_w_tta')
+    outfile_prefix='./work_dirs/ddq_recycle/result/ddq_soft_nms_w_tta')
 
 # inference on test dataset and
 # format the output results for submission.
@@ -230,7 +208,7 @@ model = dict(
         label_noise_scale=0.5,
         box_noise_scale=1.0,
         group_cfg=dict(dynamic=True, num_groups=None, num_dn_queries=100)),
-    dqs_cfg=dict(type='nms', iou_threshold=0.8),
+    dqs_cfg=dict(type='soft_nms', iou_threshold=0.5),
     # training and testing settings
     train_cfg=dict(
         assigner=dict(
@@ -246,12 +224,12 @@ model = dict(
 # optimizer
 optim_wrapper = dict(
     type='OptimWrapper',
-    optimizer=dict(type='AdamW', lr=0.0002, weight_decay=0.05),
+    optimizer=dict(type='AdamW', lr=0.00005, weight_decay=0.05),
     clip_grad=dict(max_norm=0.1, norm_type=2),
     paramwise_cfg=dict(custom_keys={'backbone': dict(lr_mult=0.05)}))
 
 # learning policy
-max_epochs = 20
+max_epochs = 40
 train_cfg = dict(
     type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=1)
 
@@ -271,7 +249,7 @@ param_scheduler = [
         begin=0,
         end=max_epochs,
         by_epoch=True,
-        milestones=[20, 26],
+        milestones=[22, 26],
         gamma=0.1)
 ]
 
@@ -285,7 +263,7 @@ tta
 '''
 tta_model = dict(
    type='DetTTAModel',
-   tta_cfg=dict(nms=dict(type='nms', iou_threshold=0.5), max_per_img=100))
+   tta_cfg=dict(nms=dict(type='soft_nms', iou_threshold=0.5), max_per_img=100))
 tta_pipeline = [
        dict(type='LoadImageFromFile', file_client_args=dict(backend='disk')),
        dict(type='TestTimeAug',
@@ -311,7 +289,7 @@ default_hooks = dict(
     timer=dict(type='IterTimerHook'),
     logger=dict(type='LoggerHook', interval=100),
     param_scheduler=dict(type='ParamSchedulerHook'),
-    checkpoint=dict(type='CheckpointHook', interval=1),
+    checkpoint=dict(type='CheckpointHook', interval=1, max_keep_ckpts=5),
     sampler_seed=dict(type='DistSamplerSeedHook'),
     visualization=dict(type='DetVisualizationHook'))
 
@@ -337,4 +315,4 @@ log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 
 log_level = 'INFO'
 load_from = None
-resume = './work_dirs/ddq_recycle/epoch_15.pth'
+resume = None
