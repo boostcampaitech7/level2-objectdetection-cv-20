@@ -1,5 +1,5 @@
 import torch
-import tqdm
+from tqdm import tqdm
 import os
 
 class Averager:
@@ -57,4 +57,3 @@ def train_fn(num_epochs, train_data_loader, optimizer, model, device):
             
             torch.save(model.state_dict(), save_path)
             best_loss = loss_hist.value
-

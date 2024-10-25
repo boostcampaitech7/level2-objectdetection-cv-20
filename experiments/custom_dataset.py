@@ -63,7 +63,7 @@ class CustomDataset(torch.utils.data.Dataset):
     def load_mosaic(self, index):
         # Size of Mosaic Image
         s = 1024
-        # Initialize 
+         
         indices = [index] + [random.randint(0, len(self.coco.getImgIds())-1) for _ in range(3)]
         final_boxes, final_labels = [], []
         mosaic_img = np.zeros((s, s, 3), dtype=np.float32)
@@ -72,9 +72,6 @@ class CustomDataset(torch.utils.data.Dataset):
         for i, idx in enumerate(indices):
             image, boxes, labels, _ = self.load_image_info(idx)
             h, w = image.shape[:2]
-
-            if not isinstance(image, np.ndarray):
-                image = image.cpu().numpy().transpose(1,2,0)
 
             if i == 0:  # top-left
                 x1a, y1a, x2a, y2a = 0, 0, xc, yc
@@ -90,7 +87,6 @@ class CustomDataset(torch.utils.data.Dataset):
                 x1b, y1b, x2b, y2b = 0, 0, s-xc, s-yc
 
             offset_x, offset_y  = x1a - x1b, y1a - y1b
-
             boxes[:, 0] += offset_x
             boxes[:, 1] += offset_y
             boxes[:, 2] += offset_x
@@ -104,7 +100,7 @@ class CustomDataset(torch.utils.data.Dataset):
         final_boxes[:, 0:] = np.clip(final_boxes[:, 0:], 0, s).astype(np.int32)
         final_labels = np.concatenate(final_labels, axis=0)
 
-        keep = np.where((boxes[:, 2] > boxes[:, 0]) & (boxes[:, 3] > boxes[:, 1]))[0]
+        keep = np.where((final_boxes[:, 2] > final_boxes[:, 0]) & (final_boxes[:, 3] > final_boxes[:, 1]))[0]
         final_boxes, final_labels = final_boxes[keep], final_labels[keep]
 
         target = {
@@ -112,16 +108,6 @@ class CustomDataset(torch.utils.data.Dataset):
             'labels': torch.tensor(final_labels, dtype=torch.int64),
             'image_id': torch.tensor([index])
         }
-
-        # if self.transforms:
-        #     sample = {
-        #         'image': mosaic_img,
-        #         'bboxes': target['boxes'],
-        #         'labels': final_labels
-        #     }
-        #     sample = self.transforms(**sample)
-        #     image = sample['image']
-        #     target['boxes'] = torch.tensor(sample['bboxes'], dtype=torch.float32)
 
         transform = A.Compose([
             ToTensorV2(p=1.0)
@@ -132,7 +118,7 @@ class CustomDataset(torch.utils.data.Dataset):
             'labels': final_labels
         }
         mosaic_img = transform(**sample)['image']
-        target['boxes'] = torch.tensor(sample['bboxes'], dypte=torch.float32)
+        target['boxes'] = torch.tensor(sample['bboxes'], dtype=torch.float32)
 
         return mosaic_img, target, index
 
