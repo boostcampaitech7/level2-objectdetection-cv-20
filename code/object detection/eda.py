@@ -157,15 +157,15 @@ class EDAprint():
             
             axes[i][1].set_title(f'Average Object Size Distribution for {class_name}')
             axes[i][1].set_xlabel('Average Size (Width + Height) / 2')
-            axes[i][1].set_ylabel('Density')
-
+            axes[i][1].set_ylabel('Density')    
+            axes[i][1].set_xlim(0,self.widthMax)
          # 누적합 계산 및 막대그래프
             cumulative_sum = np.cumsum(hist)
             axes[i][2].bar(bin_edges[:-1], cumulative_sum, width=5, alpha=0.7, color=self.colors[i % len(self.colors)])
             axes[i][2].set_title(f'Cumulative Average Object Size for {class_name}')
             axes[i][2].set_xlabel('Average Size (Width + Height) / 2')
             axes[i][2].set_ylabel('Cumulative Frequency')
-
+            axes[i][2].set_xlim(0,self.widthMax)
         plt.tight_layout()
         plt.show()
 
