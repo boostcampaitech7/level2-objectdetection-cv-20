@@ -9,4 +9,8 @@
 **/*-master
 **/*.log
 **/*.txt
-
+**/yolo/runs
+**/yolo/**.pt
+**/*.csv
+**/streamlit_for_Object_Detection
+**/mmdetection

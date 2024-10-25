@@ -1,0 +1,3 @@
+git push origin --delete
+git push --set-upstream origin
+git remote prune origin
