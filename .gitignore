@@ -5,6 +5,14 @@
 **/*.pyc
 **/wandb
 **/*.wandb
+**/__pycache__/
+**/*-master
+**/*.log
+**/*.txt
+**/yolo/runs
+**/yolo/**.pt
+**/*.csv
+
 **/*-master
 **/*.log
 **/*.txt
@@ -20,4 +28,3 @@
 **/*.csv
 
 **/artifacts
-
