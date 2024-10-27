@@ -31,7 +31,6 @@
 
 </div>
 
-wrap up 레포트 : [wrap up report](링크)
 <br/>
 <br/>
 
@@ -51,25 +50,56 @@ wrap up 레포트 : [wrap up report](링크)
 <br/>
 
 ### 3.2. 프로젝트 구조
-프로젝트는 다음과 같은 구조로 구성되어 있습니다. 
-```
-Folder Tree Structure 
-```
-
-<br/>
-
-### 3.3. 프로젝트 실행방법
+프로젝트는 다음과 같은 구조로 구성되어 있습니다. 프로젝트를 진행하면서 수행한 EDA, 증강, 앙상블 등 실험을 정리한 experiments 폴더와 객체 탐지 모델의 주요 라이브러리별 적용을 위해 model 폴더을 별도로 구분하였습니다. 이 외에 etc는 프로젝트 설명을 위한 기타 파일들을 모아둔 폴더입니다. 
 
 ```
-code
+.
+├── README.md
+├── etc
+├── experiments
+│   ├── EDA
+│   ├── ensemble
+│   ├── mosaic
+│   └── small_object
+├── model
+│   ├── detectron2
+│   ├── mmdetection
+│   ├── mmdetection_v3
+│   └── yolo
+└── submission
 ```
 
 <br/>
 
 ## 4. 프로젝트 결과 
+### 4.1. 최종 모델 평가
+| Model | Backbone | Score Threshold | TTA | Augmentation | Oversampling | Result (mAP50) |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|H-DINO|  ResNet50| 0.1|	X	|N/A|N/A|0.3924|
+|H-DINO|	ResNet50|	0.1|	O	|N/A|N/A|0.5488|
+|H-DINO|	ResNet50|	0.05|	O	|N/A|N/A|0.5514|
+|DDQ DETR|	Swin-L|	0.05|	O	|N/A|N/A|0.6416|
+|DDQ DETR|	Swin-L|	0.03|	O	|N/A|N/A|0.6416|
+|DDQ DETR|	Swin-L|	0.05|	O	|Mosaic|N/A|0.6537|
+|ATSS|	ResNet50_FPN|	0.05|	X	|N/A|N/A|0.4688|
+|ATSS|	Swin-L|	0.05|	O	|N/A|N/A|0.4784|
+|DINO|	Swin-L|	0.05|	O	|Yes| O	|0.6660|
+|DINO|	Swin-L|	0.05|	O	|N/A|N/A|0.6285|
 
+### 4.2. 최종 모델 앙상블
+| Method | Model1 | Model2 | Model3 | Result (mAP50) |
+|:---:|:---:|:---:|:---:|:---:|
+|WBF|	DDQ*|	DINO*|N/A|0.6597|
+|WBF|	DINO*|DDQ(Mosaic)*|N/A|0.6566|
+|WBF|	DINO*|	DDQ*|N/A|0.6421|
+|WBF|	ATSS|	DINO*|	DDQ*	|0.6581|
+|Soft-NMS|	ATSS|	DINO*	|DDQ*	|0.6258|
+|NMS|	ATSS|	DINO*|	DDQ*	|0.6421|
 
+참고) *는 TTA 적용할 경우 표기기
 
+더욱 자세한 설명은 아래 wrap-up report를 통해 확인할 수 있습니다.
+* wrap up 레포트 : [wrap up report](링크)
 <br/>
 <br/>
 
