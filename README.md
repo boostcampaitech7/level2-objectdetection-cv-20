@@ -56,8 +56,8 @@
 </table> 
 
 |Name|Roles|
-|:-------:|:--------------------------------------------------------------:|
-|김성규| 타임라인 관리, EDA 분석, cascade r-cnn, EfficientDet, ATSS 모델 성능 실험, 앙상블(weighted boxes fusion) 적용 |
+|:----------:|:------------------------------------------------------------:|
+|김성규| 타임라인 관리, EDA 분석, Cascade r-cnn, EfficientDet, ATSS 모델 성능 실험, 앙상블(WBF) 적용 |
 |김유경| Git 관리, small object 증강 실험, DDQ, H-Dino 모델 성능 실험 |
 |김재진| EDA 분석, YOLO11, EfficientDet, DINO, ATSS 모델 성능 실험 |
 |박수영| 회의록 작성 및 서버 사용 관리, 증강 실험|
@@ -123,7 +123,7 @@ wrap up 레포트 : [wrap up report](링크)
 
 > Models
 
-![image](https://github.com/user-attachments/assets/0f37d20c-a764-4c83-9be6-a0d16df9ec54)
+![image](https://github.com/user-attachments/assets/fcb28b54-5d51-4dd6-9336-56705328eca8)
 
 - 기본적인 1-stage, 2-stage 모델부터 최신 SOTA 논문에 등재된 모델들까지 다양하게 실험했습니다. 
 - 1-stage model : EfficientDet, YOLO11, 
