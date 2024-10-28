@@ -1,40 +1,14 @@
-# python tools/train.py ./my_config/dino_swin_recycle.py
-
 '''
 dataset
 '''
-# dataset settings
 dataset_type = 'TrashDataset'
 data_root = '/data/ephemeral/home/level2-objectdetection-cv-20/dataset/'
 
-# Example to use different file client
-# Method 1: simply set the data root and let the file I/O module
-# automatically infer from prefix (not support LMDB and Memcache yet)
 
-# data_root = 's3://openmmlab/datasets/detection/coco/'
-
-# Method 2: Use `backend_args`, `file_client_args` in versions before 3.0.0rc6
-# backend_args = dict(
-#     backend='petrel',
-#     path_mapping=dict({
-#         './data/': 's3://openmmlab/datasets/detection/',
-#         'data/': 's3://openmmlab/datasets/detection/'
-#     }))
 backend_args = None
-
 '''
 dataset - pipeline
 '''
-# train_pipeline = [
-#     dict(type='LoadImageFromFile', backend_args=backend_args),
-#     dict(type='LoadAnnotations', with_bbox=True),
-#     dict(type='Resize', scale=(512,512), keep_ratio=True),
-#     dict(type='RandomFlip', prob=0.5),
-#     dict(type='PackDetInputs')
-# ]
-
-# train_pipeline, NOTE the img_scale and the Pad's size_divisor is different
-# from the default setting in mmdet.
 train_pipeline = [
     dict(type='LoadImageFromFile', backend_args=backend_args),
     dict(type='LoadAnnotations', with_bbox=True),
@@ -70,7 +44,6 @@ train_pipeline = [
         ]),
     dict(type='RandomFlip', prob=0.5, direction='horizontal'),
     dict(type='RandomFlip', prob=0.5, direction='vertical'),
-    dict(type='RandomCrop', crop_size=(300, 300), bbox_clip_border=True),
     dict(
         type='PhotoMetricDistortion',
         brightness_delta=20,  
@@ -100,11 +73,11 @@ test_pipeline = [
 dataset - dataloader
 '''
 train_dataloader = dict(
-    batch_size=12,
+    batch_size=2,
     num_workers=8,
     persistent_workers=True,
-    sampler=dict(type='DefaultSampler', shuffle=True),
     batch_sampler=dict(type='AspectRatioBatchSampler'),
+    sampler=dict(type='ClassAwareSampler'),
     dataset=dict(
         type=dataset_type,
         data_root=data_root,
@@ -115,7 +88,7 @@ train_dataloader = dict(
         backend_args=backend_args))
 
 val_dataloader = dict(
-    batch_size=12,
+    batch_size=2,
     num_workers=8,
     persistent_workers=True,
     drop_last=False,
@@ -130,7 +103,7 @@ val_dataloader = dict(
         backend_args=backend_args))
 
 test_dataloader = dict(
-    batch_size=16,
+    batch_size=2,
     num_workers=8,
     persistent_workers=True,
     drop_last=False,
@@ -152,8 +125,6 @@ val_evaluator = dict(
     ann_file=data_root + 'val_20.json',
     metric='bbox',
     format_only=False,
-    # classwise=True,
-    # outfile_prefix='./work_dirs/recycle/result/dino_swin_val',
     backend_args=backend_args)
 
 test_evaluator = dict(
@@ -170,10 +141,10 @@ test_evaluator = dict(
 model
 '''
 pretrained = 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_large_patch4_window12_384_22k.pth'  # noqa
-num_levels = 5
+num_levels = 6
 model = dict(
     type='DINO',
-    num_queries=900,  # num_matching_queries
+    num_queries=900,  
     with_box_refine=True,
     as_two_stage=True,
     data_preprocessor=dict(
@@ -198,8 +169,6 @@ model = dict(
         drop_path_rate=0.2,
         patch_norm=True,
         out_indices=(0, 1, 2, 3),
-        # Please only add indices that would be used
-        # in FPN, otherwise some parameter will not be used
         with_cp=True,
         convert_weights=True,
         init_cfg=dict(type='Pretrained', checkpoint=pretrained)),
@@ -216,30 +185,30 @@ model = dict(
         num_layers=6,
         layer_cfg=dict(
             self_attn_cfg=dict(embed_dims=256, num_levels=num_levels,
-                               dropout=0.0),  # 0.1 for DeformDETR
+                               dropout=0.0), 
             ffn_cfg=dict(
                 embed_dims=256,
-                feedforward_channels=2048,  # 1024 for DeformDETR
-                ffn_drop=0.0))),  # 0.1 for DeformDETR
+                feedforward_channels=2048, 
+                ffn_drop=0.0))), 
     decoder=dict(
         num_layers=6,
         return_intermediate=True,
         layer_cfg=dict(
             self_attn_cfg=dict(embed_dims=256, num_heads=8,
-                               dropout=0.0),  # 0.1 for DeformDETR
+                               dropout=0.0),  
             cross_attn_cfg=dict(embed_dims=256, num_levels=num_levels,
-                                dropout=0.0),  # 0.1 for DeformDETR
+                                dropout=0.0),  
             ffn_cfg=dict(
                 embed_dims=256,
-                feedforward_channels=2048,  # 1024 for DeformDETR
-                ffn_drop=0.0)),  # 0.1 for DeformDETR
+                feedforward_channels=2048,
+                ffn_drop=0.0)),  
         post_norm_cfg=None),
 
     positional_encoding=dict(
         num_feats=128,
         normalize=True,
-        offset=0.0,  # -0.5 for DeformDETR
-        temperature=20),  # 10000 for DeformDETR
+        offset=0.0, 
+        temperature=20), 
     bbox_head=dict(
         type='DINOHead',
         num_classes=10,
@@ -249,15 +218,15 @@ model = dict(
             use_sigmoid=True,
             gamma=2.0,
             alpha=0.25,
-            loss_weight=1.0),  # 2.0 in DeformDETR
+            loss_weight=1.0), 
         loss_bbox=dict(type='L1Loss', loss_weight=5.0),
         loss_iou=dict(type='GIoULoss', loss_weight=2.0)),
-    dn_cfg=dict(  # TODO: Move to model.train_cfg ?
+    dn_cfg=dict( 
         label_noise_scale=0.5,
-        box_noise_scale=1.0,  # 0.4 for DN-DETR
+        box_noise_scale=1.0,
         group_cfg=dict(dynamic=True, num_groups=None,
-                       num_dn_queries=100)),  # TODO: half num_dn_queries
-    # training and testing settings
+                       num_dn_queries=100)),  
+
     train_cfg=dict(
         assigner=dict(
             type='HungarianAssigner',
@@ -266,20 +235,20 @@ model = dict(
                 dict(type='BBoxL1Cost', weight=5.0, box_format='xywh'),
                 dict(type='IoUCost', iou_mode='giou', weight=2.0)
             ])),
-    test_cfg=dict(max_per_img=300))  # 100 for DeformDETR
+    test_cfg=dict(max_per_img=300))  
 
-# optimizer
+
 optim_wrapper = dict(
-    type='OptimWrapper',
+    type='AmpOptimWrapper',
     optimizer=dict(
         type='AdamW',
         lr=0.0005, 
         weight_decay=0.0001),
     clip_grad=dict(max_norm=0.1, norm_type=2),
     paramwise_cfg=dict(custom_keys={'backbone': dict(lr_mult=0.1)}),
-)  # custom_keys contains sampling_offsets and reference_points in DeformDETR  # noqa
+) 
 
-# learning policy
+
 max_epochs = 20
 train_cfg = dict(
     type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=1)
@@ -289,12 +258,6 @@ test_cfg = dict(type='TestLoop')
 
 param_scheduler = [
     dict(
-        type='LinearLR',
-        start_factor=0.0004,
-        by_epoch=False,
-        begin=0,
-        end=2000),
-    dict(
         type='MultiStepLR',
         begin=0,
         end=max_epochs,
@@ -303,9 +266,6 @@ param_scheduler = [
         gamma=0.1)
 ]
 
-# NOTE: `auto_scale_lr` is for automatically scaling LR,
-# USER SHOULD NOT CHANGE ITS VALUES.
-# base_batch_size = (8 GPUs) x (2 samples per GPU)
 auto_scale_lr = dict(base_batch_size=8)
 
 
@@ -370,4 +330,4 @@ log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 
 log_level = 'INFO'
 load_from = None
-resume = None# './work_dirs/dino_swin_recycle/epoch_1.pth'
+resume = None
