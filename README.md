@@ -174,7 +174,7 @@ wrap up 레포트 : [wrap up report](https://github.com/boostcampaitech7/level2-
 - 실제 feature map level 을 5에서 6으로 변경한 이후 EDA는 다음과 같습니다. 
 - 이미지 크기 정확도
 ![image](https://github.com/user-attachments/assets/5da7331d-2a8c-45de-a3d8-780569671add)
-- 작은 객체체 정확도
+- 작은 객체 정확도
 ![image](https://github.com/user-attachments/assets/7c99df36-136f-47c6-acf6-ab2bd1a85a3c)
 <br/>
 
