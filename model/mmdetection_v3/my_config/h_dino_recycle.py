@@ -1,5 +1,3 @@
-# python tools/train.py ./my_config/h_dino_recycle.py
-
 '''
 dataset
 '''
@@ -25,13 +23,6 @@ backend_args = None
 '''
 dataset - pipeline
 '''
-# train_pipeline = [
-#     dict(type='LoadImageFromFile', backend_args=backend_args),
-#     dict(type='LoadAnnotations', with_bbox=True),
-#     dict(type='Resize', scale=(512,512), keep_ratio=True),
-#     dict(type='RandomFlip', prob=0.5),
-#     dict(type='PackDetInputs')
-# ]
 
 # train_pipeline, NOTE the img_scale and the Pad's size_divisor is different
 # from the default setting in mmdet.
@@ -101,21 +92,6 @@ train_dataloader = dict(
         pipeline=train_pipeline,
         backend_args=backend_args))
 
-# val_dataloader = dict(
-#     batch_size=1,
-#     num_workers=2,
-#     persistent_workers=True,
-#     drop_last=False,
-#     sampler=dict(type='DefaultSampler', shuffle=False),
-#     dataset=dict(
-#         type=dataset_type,
-#         data_root=data_root,
-#         ann_file='annotations/instances_val2017.json',
-#         data_prefix=dict(img='val2017/'),
-#         test_mode=True,
-#         pipeline=test_pipeline,
-#         backend_args=backend_args))
-
 test_dataloader = dict(
     batch_size=1,
     num_workers=2,
@@ -133,13 +109,6 @@ test_dataloader = dict(
 '''
 dataset - evaluator
 '''
-# val_evaluator = dict(
-#     type='CocoMetric',
-#     ann_file=data_root + 'annotations/instances_val2017.json',
-#     metric='bbox',
-#     format_only=False,
-#     backend_args=backend_args)
-
 test_evaluator = dict(
     type='CocoMetric',
     metric='bbox',
@@ -254,8 +223,7 @@ max_epochs = 20
 train_cfg = dict(
     type='EpochBasedTrainLoop', max_epochs=max_epochs, val_interval=1)
 
-#val_cfg = dict(type='ValLoop')
-val_cfg=None
+val_cfg = None
 test_cfg = dict(type='TestLoop')
 
 param_scheduler = [
