@@ -64,7 +64,9 @@
 |이단유| EDA 분석, faster r-cnn 모델 성능 실험, 증강 실험, 보고서 관리|
 
 </div>
-wrap up 레포트 : [wrap up report](링크)
+
+wrap up 레포트 : [wrap up report](https://github.com/boostcampaitech7/level2-objectdetection-cv-20/blob/main/Object%20Det_CV_%ED%8C%80%20%EB%A6%AC%ED%8F%AC%ED%8A%B8(20%EC%A1%B0).pdf)
+
 <br/>
 <br/>
 
@@ -172,7 +174,7 @@ wrap up 레포트 : [wrap up report](링크)
 - 실제 feature map level 을 5에서 6으로 변경한 이후 EDA는 다음과 같습니다. 
 - 이미지 크기 정확도
 ![image](https://github.com/user-attachments/assets/5da7331d-2a8c-45de-a3d8-780569671add)
-- 객체 비율별 정확도
+- 작은 객체체 정확도
 ![image](https://github.com/user-attachments/assets/7c99df36-136f-47c6-acf6-ab2bd1a85a3c)
 <br/>
 
@@ -190,7 +192,7 @@ python tools/train.py {config 폴더 경로}
 
 # DINO Train:
 
-python tools/train.py my_config/dino_swin_recycle_going2_aug_v2.py
+python tools/train.py my_config/dino_swin_recycle_v3.py
 ```
 
 3. `test.py` 실행
@@ -199,7 +201,7 @@ python tools/test.py {config 폴더 경로} {model checkpoint 경로} [tta 여�
 
 # DINO Test:
 
-python tools/test.py my_config/work_dirs/dino_recycle/epoch_num.pth --tta
+python tools/test.py my_config/dino_swin_recycle_v3.py my_config/work_dirs/dino_recycle/epoch_num.pth --tta
 ```
 
 4. 생성된 json file을 `submission` 형태로 변환
